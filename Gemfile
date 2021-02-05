@@ -18,6 +18,11 @@ group :development, :test do
   gem 'factory_bot_rails'
 end
 
+group :test do
+  gem 'capybara'
+  gem 'webdrivers'
+end
+
 group :development do
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
@@ -30,11 +35,6 @@ group :development do
   gem 'pry-doc'
   gem 'rubocop'
   gem 'rails_best_practices'
-end
-
-group :test do
-  gem 'capybara'
-  gem 'webdrivers'
 end
 
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
