@@ -1,12 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe 'Users', type: :system, focus: true do
+  let(:user) { create(:user) }
 
   describe 'ログイン前' do
     context 'フォームの入力値が正常' do
       it 'ログイン処理が成功する' do
-        user = create(:user)
-        login(user)
+        login_as(user)
         expect(current_path).to eq root_path
         expect(page).to have_content "Login successful"
       end
@@ -24,9 +24,8 @@ RSpec.describe 'Users', type: :system, focus: true do
   describe 'ログイン後' do
     context 'ログアウトボタンをクリック' do
       it 'ログアウト処理が成功する' do
-        user = create(:user)
-        login(user)
-        logout
+        login_as(user)
+        click_link 'Logout'
         expect(current_path).to eq root_path
         expect(page).to have_content "Logged out"
       end

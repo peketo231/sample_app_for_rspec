@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Users', type: :system, focus: true do
+  let(:user) { create(:user) }
 
   describe 'ログイン前' do
     describe 'ユーザー新規登録' do
@@ -28,9 +29,9 @@ RSpec.describe 'Users', type: :system, focus: true do
       end
       context '登録済のメールアドレスを使用' do
         it 'ユーザーの新規作成が失敗する' do
-          user = create(:user, email: 'user@example.com')
+          existed_user = create(:user)
           visit sign_up_path
-          fill_in 'Email', with: 'user@example.com'
+          fill_in 'Email', with: existed_user.email
           fill_in 'Password', with: 'password'
           fill_in 'Password confirmation', with: 'password'
           click_button 'SignUp'
@@ -43,7 +44,6 @@ RSpec.describe 'Users', type: :system, focus: true do
     describe 'マイページ' do
       context 'ログインしていない状態' do
         it 'マイページへのアクセスが失敗する' do
-          user = create(:user)
           visit user_path(user)
           expect(current_path).to eq login_path
           expect(page).to have_content "Login required"
@@ -56,8 +56,7 @@ RSpec.describe 'Users', type: :system, focus: true do
     describe 'ユーザー編集' do
       context 'フォームの入力値が正常' do
         it 'ユーザーの編集が成功する' do
-          user = create(:user)
-          login(user)
+          login_as(user)
           visit edit_user_path(user)
           fill_in 'Email', with: 'user@example.com'
           fill_in 'Password', with: 'password'
@@ -69,8 +68,7 @@ RSpec.describe 'Users', type: :system, focus: true do
       end
       context 'メールアドレスが未入力' do
         it 'ユーザーの編集が失敗する' do
-          user = create(:user)
-          login(user)
+          login_as(user)
           visit edit_user_path(user)
           fill_in 'Email', with: ''
           fill_in 'Password', with: 'password'
@@ -82,11 +80,10 @@ RSpec.describe 'Users', type: :system, focus: true do
       end
       context '登録済のメールアドレスを使用' do
         it 'ユーザーの編集が失敗する' do
-          user = create(:user)
-          another_user = create(:user, email: 'another_user@example.com')
-          login(user)
+          other_user = create(:user)
+          login_as(user)
           visit edit_user_path(user)
-          fill_in 'Email', with: 'another_user@example.com'
+          fill_in 'Email', with: other_user.email
           fill_in 'Password', with: 'password'
           fill_in 'Password confirmation', with: 'password'
           click_button 'Update'
@@ -96,10 +93,9 @@ RSpec.describe 'Users', type: :system, focus: true do
       end
       context '他ユーザーの編集ページにアクセス' do
         it '編集ページへのアクセスが失敗する' do
-          user = create(:user)
-          another_user = create(:user)
-          login(user)
-          visit edit_user_path(another_user)
+          other_user = create(:user)
+          login_as(user)
+          visit edit_user_path(other_user)
           expect(current_path).to eq user_path(user)
           expect(page).to have_content "Forbidden access."
         end
@@ -109,8 +105,7 @@ RSpec.describe 'Users', type: :system, focus: true do
     describe 'マイページ' do
       context 'タスクを作成' do
         it '新規作成したタスクが表示される' do
-          user = create(:user)
-          login(user)
+          login_as(user)
           visit user_path(user)
           click_link 'New task'
           fill_in 'Title', with: 'title'
