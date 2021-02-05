@@ -27,11 +27,12 @@ RSpec.describe "Tasks", type: :system, focus: true do
   end
 
   describe 'ログイン後' do
+    before { login_as(user) }
+
     describe 'タスク新規登録' do
       context 'フォームの入力値が正常' do
         it 'タスクの新規作成が成功する' do
-          login_as(user)
-          click_link 'New Task'
+          visit new_task_path
           fill_in 'Title', with: 'title'
           fill_in 'Content', with: 'content'
           select 'todo', from: 'Status'
@@ -46,11 +47,10 @@ RSpec.describe "Tasks", type: :system, focus: true do
     describe 'タスク編集' do
       let!(:task) { create(:task, user: user) }
       let(:other_task) { create(:task, user: user) }
+      before { visit edit_task_path(task) }
 
       context 'フォームの入力値が正常' do
         it 'タスクの編集が成功する' do
-          login_as(task.user)
-          click_link 'Edit'
           fill_in 'Title', with: 'title'
           fill_in 'Content', with: 'content'
           select 'todo', from: 'Status'
@@ -66,7 +66,7 @@ RSpec.describe "Tasks", type: :system, focus: true do
       let!(:task) { create(:task, user: user) }
 
       it 'タスクの削除が成功する' do
-        login_as(task.user)
+        visit tasks_path
         click_link 'Destroy'
         expect(page.accept_confirm).to eq "Are you sure?"
         expect(current_path).to eq tasks_path
